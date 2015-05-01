@@ -1,0 +1,75 @@
+\documentclass[12pt]{article}
+% Last Revision:
+
+%New notation: \hfill\triangle for end of theorem.
+
+% Setup:
+\usepackage{amssymb,latexsym,amsmath,amsthm,changepage}
+\usepackage{hyperref}
+\usepackage[margin=1in]{geometry}
+\usepackage[usenames,dvipsnames]{color}
+\hypersetup{
+	urlcolor=blue,
+	citecolor=green,
+	linkcolor=OliveGreen,
+	colorlinks=true
+	}
+\makeatletter
+\renewcommand\@makefntext[1]{\leftskip=0em\hskip-0em\@makefnmark#1}
+\makeatother
+\newcommand{\cmnt}[1]{}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem*{solution}{Solution}
+
+\newenvironment{exercise}[2][Exercise]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{problem}[2][Problem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\theoremstyle{remark}
+
+\newcommand{\cmpl}{\phantom{ }^\mathsf{c}}
+\newcommand{\setn}{_{k \in \mathbb{N}}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand*\w[1]{\overrightarrow{#1}}
+\newcommand{\st}{\text{ s.t. }}
+\newcommand{\wind}{\indent\indent}
+\newcommand{\rind}{\indent\indent\indent}
+\newcommand{\enfa}{$\epsilon$-\text{NFA}}
+\newcommand{\viset}{\{\w{v_1}, \ldots, \w{v_n}\}}
+\newcommand{\wiset}{\{\w{w_1}, \ldots, \w{w_n}\}}
+\newcommand*\tund[2]{\underbrace{#1}_\text{#2}}
+\newcommand*\tover[2]{\overbrace{#1}_\text{#2}}
+\newcommand{\IF}{\text{ if }}
+\newcommand{\then}{\text{ then }}
+\newcommand{\ow}{\text{ otherwise }}
+\newcommand{\elab}{\textbf{\color{blue}{ Elaboration Needed. }}}
+\newcommand{\gr}{\text{growth}}
+\newcommand{\ttt}[1]{\texttt{#1}}
+
+% Document
+\begin{document}
+\hfill John Loeber\\
+\noindent{\Large PL Research: Language Specification} \hfill \today
+\vspace{1.2pt}
+\hrule
+\vspace*{1.8mm}
+$$$$
+\noindent 
+To avoid leaving the project nameless any further, I propose that the program (i.e. the software being developed) will be called \textbf{Embi} (as a working name). Let's recap the features of Embi:
+\begin{enumerate}
+\item Graphical interface (``GUI'') for manipulating visual elements on the canvas, like in Paint, Photoshop, etc.
+\item Data panel that stores the \textbf{data}: all information on all visual elements on the canvas. May be manipulated by the user.
+\item Code panel that allows the user to modify the data using a domain-specific language, \textbf{Embil}.
+\item History panel (tabbed with code) that records, in Embil, all changes made to the program state.
+\end{enumerate}
+
+\noindent
+The purpose of this document is to lay out a language specification for a toy version of Embil (i.e. one that I can implement within the next few weeks). I'll need some guidance from you with respect to the proper PL 
+
+\end{document}
