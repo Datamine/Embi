@@ -70,6 +70,94 @@ To avoid leaving the project nameless any further, I propose that the program (i
 \end{enumerate}
 
 \noindent
-The purpose of this document is to lay out a language specification for a toy version of Embil (i.e. one that I can implement within the next few weeks). I'll need some guidance from you with respect to the proper PL 
+The purpose of this document is to lay out a language specification for a toy version of Embil (i.e. one that I can implement within the next few weeks). I'll need some guidance on the proper PL conventions regarding reduction rules, notation for typing, etc.
+\\\\
+\textbf{High-Level Stuff}
+\\\\
+In this draft, the code-panel is basically a REPL for Embil. Appropriately, Embil is simple. It currently does not support user-defined functions or types (though it should in a more mature version). As the language has a strong imperative/declarative touch to it and is meant to support experimentation, all variables are mutable. Types are not declared, but inferred. 
+\\\\
+Visual elements and functions generally take arguments. The most common arguments are the (x,y) coordinates of an object. These (x,y) coordinates are \textbf{always} with respect to the top-left corner of the object. Similarly, the top-left corner of a canvas is (0,0), and the bottom-right (x,y).
 
+\newpage 
+\noindent
+Here's what's in toy-Embil. I also want to make a list of the things I want in full-fledged Embil (user-defined functions, typeclasses, Haskell- and Python-style list comprehensions, etc.), but I'll hold out on that until the toy-version is ready.
+\\\\
+Note that for properties of objects, I like an explicit syntax \`a la \ttt{object(property:value)}. If the user does not enter a value for a property, that property defaults to a default value. Defaults are to be decided, as are syntactical conventions. This is not yet a thorough documentation at all, just some notes on what things should be like.
+\\\\
+\textbf{Datatypes}
+\begin{enumerate}
+\item Booleans
+\item Integers
+\item Floats
+\item Strings (currently only to describe colors)
+\item Lists: \ttt{[] [1,2,3]}
+\item Visual Elements
+\begin{enumerate}
+\item Rectangles: \ttt{rect(w, h, x, y, color, opacity, rotation, xstretch, ystretch)}
+\item Circles: \ttt{circle(r, x, y, color, opacity, rotation, xstretch, ystretch)}
+\\ (Note: the rotation option is relevant if the circle was stretched in any direction.)
+\item Spaceholders: \ttt{space(w,h,x,y)}
+\\ (Effectively a transparent rectangle.)
+\end{enumerate}
+Note that modifying the \ttt{xstretch} and \ttt{ystretch} properties will change the width and height of an object, but \textbf{not} the x and y coordinates. This means that stretching an object will also translate it -- the user will have to adjust for this. (It would be easy to nest modifying functions to achieve this goal.)
+\item Groups: special lists in which each element is unique (like in a set in other languages). Moreover, a group is either (a) a list of visual elements, (b) a list of groups, or (c) the empty list.
+\end{enumerate}
+\newpage
+\noindent
+\textbf{Operations on Booleans}
+\\\\
+\ttt{or not and}. The usual boolean operations. No conditionals (if, else, etc.) in this toy version of Embi.
+\\\\
+\textbf{Operations on Integers and Floats}
+\\\\
+$+ \; - \;  \cdot  \; / \; \% \; a^b \; \log_b a \; \sin \; \cos$. The usual pre-calculus operations.
+\\\\
+\textbf{Operations on Strings}
+\\\\
+None
+\\\\
+\textbf{Operations on Lists}
+\begin{enumerate}
+\item Access the ith element: \ttt{List[i]}
+\item Append x to a list: \ttt{List.append(x)}
+\item Delete the ith element from list: \ttt{List.delete(index:i)}
+\item Delete the element of value x from list: \ttt{List.delete(element:x)}
+\item Test if x is in List: \ttt{List.member(x)}
+\item Length of a list: \ttt{List.length()}
+\item Map a function over a list: \ttt{List.map(function)}
+\item Generate a list of ints/floats: \ttt{range(a,b,c)} Where $a$ is the start, $b$ is the end, and $c$ is the step size. E.g. \ttt{range(0,5,1) = [0,1,2,3,4]} and \\ \ttt{range(0,1,0.2) = [0,0.2,0.4,0.6,0.8]}. Default step size is $1$.
+\item Iteration: the user may only iterate over lists. \ttt{for item in list: do something}. Thus, traditional for-looping over integers as with \ttt{for i=0;i<n;i++)} is still possible, but would use syntax \ttt{for i in range(0,n)}. (This is python-inspired.)
+\end{enumerate}
+\textbf{Operations on Visual Elements}
+\begin{enumerate}
+\item Generate $n$ distinct copies of a VE: \ttt{VE.generate(n)}
+\item Modify a property of a VE: \ttt{VE.modify(property:newvalue)}
+\\
+Where if you want to e.g. increment a property by $10$, it is correct to write\\ \ttt{VE.modify(property:VE.property+10)}. Several properties may be modified at once. \\
+(E.g. \ttt{VE.modify(p1:5,p2:60,\ldots}). Note that the user would be expected to just manipulate the data rather than write this command. This command would be the output to the history when a user manipulates the data and propagates the change.
+\item Resize a VE: \ttt{VE.resize(proportions:bool, wpercent : int or float, hpercent: int or float, hpx: int or float, hpx: int or float)}
+\\
+Where \ttt{proportions} is a bool with which the user may choose whether to keep or discard the current width/height ratio of the VE. The user may specify the new width or height in either percent (relative) or pixels (absolute). If both width and height are specified, then proportions defaults to false.
+\item Addition: occasionally it may not be convenient to combine VEs as groups. So we can simply combine visual elements by \ttt{VE3 = VE1 + VE2}.
+\end{enumerate}
+\textbf{Operations on Groups}
+\\
+(Note that since Groups are Lists, they inherit methods like length, member, etc.)
+\begin{enumerate}
+\item Intersection: \ttt{intersect(group1,group2,\ldots groupn)}
+\item Union: \ttt{union(group1,group2,\ldots, groupn)}
+\item Complement: \ttt{group1.complement}
+\\
+(This is every element in the data that is not in group1.)
+\item Spacing along the x-axis: \ttt{group.xspacing(int or float: value, sequence: list)}
+\\ Where the sequence would be a list of $n-1$ floats or ints for a group of size $n$
+\item Spacing along the y-axis: \ttt{group.yspacing(int or float: value, sequence: list)}
+\end{enumerate}
+\textbf{Other Operations}
+\begin{enumerate}
+\item \ttt{initialize canvas(w,h)}\\Initializes the canvas with dimensions (width,height).
+\end{enumerate}
+\textbf{Temporary and Persistent Variables}
+\\\\
+We've discussed temporary and persistent variables in Embil previously. The idea here is that we want to minimize co-dependencies between objects in the code. All variable declarations are persistent. Anything else is temporary, i.e. discarded after propagation. I need to figure out some way to have the \ttt{generate} statement stand on its own and discardable, while at the same time creating a group from the generated elements -- I generally need to figure out a way to allow the user to easily create groups. Perhaps some sort of list syntax would do it? E.g. \ttt{group([element1,element2,\ldots ,elementn)}
 \end{document}
