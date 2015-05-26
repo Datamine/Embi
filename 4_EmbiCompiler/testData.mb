@@ -1,0 +1,4 @@
+canvas = (w:1500,h:500)
+element1 = rect(w:20, h:40, x:0, y:0, color:006600, opacity: 0.3, rotation: 120, xstretch: 0, ystretch:0.5)
+element2 = circle(r:20, x:40, y:0, color:FF6600,    opacity: 0.6, rotation: 90, xstretch: 1.0, ystretch: 2.0 )
+element3 = rect(w:20, h:40, x:80, y:0, color:9999FF,opacity: 0.9, rotation: 0, xstretch: 2.0, ystretch:3.0)
