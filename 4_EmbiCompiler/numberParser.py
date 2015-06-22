@@ -126,9 +126,15 @@ def eval(x,tokens,memory):
                 replaced = replaced[0:i-1] + [num] + replaced[i+2:]
                 break
             elif replaced[i]=="-":
-                num = replaced[i-1] - replaced[i+1]
-                replaced = replaced[0:i-1] + [num] + replaced[i+2:]
-                break   
+                # gotta handle negative numbers!
+                if i==0:
+                    num = 0 - replaced[i+1]
+                    replaced = [num] + replaced[i+2:]
+                    break
+                else:
+                    num = replaced[i-1] - replaced[i+1]
+                    replaced = replaced[0:i-1] + [num] + replaced[i+2:]
+                    break   
     return replaced[0]
 
 def numParse(x,memory):
