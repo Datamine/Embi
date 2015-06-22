@@ -65,7 +65,6 @@ def eval(x,tokens,memory):
         subsequence = replaced[openParen+1 : firstClose]
         res = eval(x,subsequence,memory)
         replaced = replaced[0:openParen] + [res] + replaced[firstClose+1:]
-        print replaced
 
     # now go through tokens and change any remaining string-form numbers to actual numbers
     for i in range(len(replaced)):
@@ -91,7 +90,6 @@ def eval(x,tokens,memory):
         replaced = replaced[0:ind] + [num] + replaced[ind+2:]
     
     while "sin" in replaced:
-        print replaced
         ind = replaced.index("sin")
         num = sin(radians(replaced[ind+1]))
         replaced = replaced[0:ind] + [num] + replaced[ind+2:]

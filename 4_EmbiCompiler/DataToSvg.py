@@ -38,6 +38,8 @@
 
 # TODO: there's no need to parse spaceholders -- should just filter them out along with comments
 
+# TODO: input cleaning (stripping newlines, etc.) could be done in a more clean and genreal fashion.
+
 import sys
 from math import radians,sin,cos
 from numberParser import *
@@ -51,6 +53,18 @@ def isGoodHex(string):
         else:
             return False
     except ValueError:
+        return False
+
+def isGoodRadius(r):
+    if r >= 0:
+        return True
+    else:
+        return False
+
+def isGoodOpacity(op):
+    if (0 <= op <= 1):
+        return True
+    else:
         return False
 
 def parseCanvas(line,memory):
@@ -77,14 +91,10 @@ def parseCanvas(line,memory):
             width = int(numParse(part.replace("w:",""),memory))
         if "h:" in part:
             height = int(numParse(part.replace("h:",""),memory))
-#    if (width.isdigit(),height.isdigit()) != (True,True):
-#        sys.stderr.write("Error! Processing the canvas initialization line resulted in a non-integer value.\n")
-#        sys.stderr.write("Resultant width: " + width + ", height: " + height + "\n")
-#        sys.exit(1)
     outline = '<html><body>\n<svg width="'+str(width)+'" height="'+str(height) + '">\n'
     return outline
 
-def parseRect(line):
+def parseRect(line,memory):
     def throwRectError():
         sys.stderr.write("Error! Rectangle initialization line is incorrectly formatted.\n")
         sys.stderr.write("Line: " + line)
@@ -100,33 +110,30 @@ def parseRect(line):
     split = rightstrip.split(",")
     for part in split:
         if "w:" in part:
-            w = part.replace("w:","")
+            w = int(numParse(part.replace("w:",""),memory))
         elif "x:" in part:
-            x = part.replace("x:","")
+            x = int(numParse(part.replace("x:",""),memory))
         elif "color:" in part:
             color = part.replace("color:","")
         elif "opacity:" in part:
-            opacity = part.replace("opacity:","")
+            opacity = float(numParse(part.replace("opacity:",""),memory))
         elif "rotation:" in part:
-            rotation = part.replace("rotation:","")
+            rotation = float(numParse(part.replace("rotation:",""),memory))
         elif "xstretch:" in part:
-            xstretch = part.replace("xstretch:","")
+            xstretch = float(numParse(part.replace("xstretch:",""),memory))
         elif "ystretch:" in part:
-            ystretch = part.replace("ystretch:","")
+            ystretch = float(numParse(part.replace("ystretch:",""),memory))
         elif "h:" in part:
-            h = part.replace("h:","")
+            h = int(numParse(part.replace("h:",""),memory))
         elif "y:" in part:
-            y = part.replace("y:","")
+            y = int(numParse(part.replace("y:",""),memory))
 
-    check = (isInt(x),isInt(y),isInt(w),isInt(h),isFloat(rotation),isFloat(xstretch),isFloat(ystretch),isFloat(opacity),isGoodHex(color))
-    if check!=(1,1,1,1,1, 1,1,1,1):
+    check = (isGoodOpacity(opacity),isGoodHex(color))
+    if check!=(1,1):
         throwRectError()
-    rotation = float(rotation)
     h = int(int(h) * float(xstretch))
     w = int(int(w) * float(ystretch))
     if rotation!=(0%360):
-        x = int(x)
-        y = int(y)
         theta = radians(rotation)
         startPoints = [(x,y),(x+w,y),(x+w,y+h),(x,y+h)]
         centerx = x+(w/2)
@@ -137,20 +144,20 @@ def parseRect(line):
         pointString = [str(a)+","+str(b) for (a,b) in rps]
         points = (" ").join(pointString)
         # could allow for stroke, actually
-        out = '<polygon points="'+points+'" style="fill:#'+ color + ";fill-opacity:" + opacity + ';"/>\n'
+        out = '<polygon points="'+points+'" style="fill:#'+ color + ";fill-opacity:" + str(opacity) + ';"/>\n'
     else:
-        out = '<rect x="' + x +'" y="' + y + '" width="' + str(w) + '" height="' + str(h) + '" style="fill:#' + color + ";fill-opacity:" + opacity + ';"/>\n'
+        out = '<rect x="' + str(x) +'" y="' + str(y) + '" width="' + str(w) + '" height="' + str(h) + '" style="fill:#' + color + ";fill-opacity:" + str(opacity) + ';"/>\n'
     return out
 
 
-def parseCircle(line):
+def parseCircle(line,memory):
     def throwCircleError():
         sys.stderr.write("Error! Circle initialization line is incorrectly formatted.\n")
         sys.stderr.write("Line: " + line)
         sys.exit(1)
     # note whitespace has already been removed. sanity check:
-    elementCounts = [line.count(x) for x in [",","=",":","(",")"]]
-    if elementCounts!= [7,1,8,1,1]:
+    elementCounts = [line.count(x) for x in [",","=",":"]]
+    if elementCounts!= [7,1,8]:
         throwCircleError()
     # format
     line2 = line[line.index("=")+1:]
@@ -161,52 +168,46 @@ def parseCircle(line):
         if "color:" in part:
             color = part.replace("color:","")
         elif "r:" in part:
-            r = part.replace("r:","")
+            radius = float(numParse(part.replace("r:",""),memory))
         elif "x:" in part:      
-            x = part.replace("x:","")
+            x = int(numParse(part.replace("x:",""),memory))
         elif "opacity:" in part:
-            opacity = part.replace("opacity:","")
+            opacity = float(numParse(part.replace("opacity:",""),memory))
         elif "rotation:" in part:
-            rotation = part.replace("rotation:","")
+            rot = float(numParse(part.replace("rotation:",""),memory))
         elif "xstretch:" in part:
-            xstretch = part.replace("xstretch:","")
+            xs = float(numParse(part.replace("xstretch:",""),memory))
         elif "ystretch:" in part:
-            ystretch = part.replace("ystretch:","")
+            ys = float(numParse(part.replace("ystretch:",""),memory))
         elif "y:" in part:
-            y = part.replace("y:","")
+            y = int(numParse(part.replace("y:",""),memory))
 
-    check = (isInt(x),isInt(y),isFloat(r),isFloat(rotation),isFloat(xstretch),isFloat(ystretch),isFloat(opacity),isGoodHex(color))
-    if check!=(1,1,1,1, 1,1,1,1):
+    check = (isGoodRadius(radius),isGoodOpacity(opacity),isGoodHex(color))
+    if check!=(1,1,1):
         throwCircleError()
-    xs = float(xstretch)
-    ys = float(ystretch)
-    rot = float(rotation)
     if not (xs==0 and ys==0):
-        radius = float(r)
-        x = int(x)
-        y = int(y)
         stretchXr = int(radius*xs)
         stretchYr = int(radius*ys)
         ellipseCenterX = int(x+stretchXr)
         ellipseCenterY = int(y+stretchYr)
         if (rot%360)==0:
-            out = '<ellipse cx="' + str(ellipseCenterX) + '" cy="' + str(ellipseCenterY) + '" rx="' + str(stretchXr) + '" ry="' + str(stretchYr) + '" style="fill:#' + color + ";fill-opacity:" + opacity + ';"/>\n'
+            out = '<ellipse cx="' + str(ellipseCenterX) + '" cy="' + str(ellipseCenterY) + '" rx="' + str(stretchXr) + '" ry="' + str(stretchYr) + '" style="fill:#' + color + ";fill-opacity:" + str(opacity) + ';"/>\n'
         else:
-            out = '<ellipse transform="translate(' + str(ellipseCenterX) + ' ' + str(ellipseCenterY) +') rotate('+ rotation + ')" rx="' + str(stretchXr) + '" ry="' + str(stretchYr) + '" style="fill:#' + color + ";fill-opacity:" + opacity + ';"/>\n'
+            out = '<ellipse transform="translate(' + str(ellipseCenterX) + ' ' + str(ellipseCenterY) +') rotate('+ str(rot) + ')" rx="' + str(stretchXr) + '" ry="' + str(stretchYr) + '" style="fill:#' + color + ";fill-opacity:" + str(opacity) + ';"/>\n'
     else:
-        out = '<circle cx="' + str(int(x)+int(r)) +'" cy="' + str(int(y)+int(r)) + '" r="' + str(r) + '" style="fill:#' + color + ";fill-opacity:" + opacity + ';"/>\n'
+        out = '<circle cx="' + str(x+int(radius)) +'" cy="' + str(y+int(radius)) + '" r="' + str(radius) + '" style="fill:#' + color + ";fill-opacity:" + str(opacity) + ';"/>\n'
     return out
 
-def parseElement(line):
+def parseElement(line,memory):
     # remove whitespace
     line2 = line[line.index("=")+1:]
     if line2[:4]=="spac":
         # there's nothing to be done for a spaceholding element. Spaceholders only exist to affect group operations.
         return
     elif line2[:4]=="circ":
-        return parseCircle(line)
+        return parseCircle(line,memory)
     elif line2[:4]=="rect":
-        return parseRect(line)
+        return parseRect(line,memory)
     else:
         sys.stderr.write("Error! Line is specifying an unknown type of visual element.\n")
         sys.stderr.write("Problematic line: " + line)
@@ -239,7 +240,7 @@ def toSvg(infile):
         # parse only the lines that actually describe elements
         line = line.replace(" ", "")
         if line[:7]=="element" and line[7:line.index("=")].isdigit():
-            convertedToSvg = parseElement(line)
+            convertedToSvg = parseElement(line,memory)
             # check for None in case we're parsing a spaceholder.
             if convertedToSvg!=None:
                 outfile.append(convertedToSvg)
